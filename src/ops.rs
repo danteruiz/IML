@@ -6,28 +6,33 @@
 // Distributed under the MIT Lisense
 // https://mit-license.org/
 
-pub(crate) trait Dot<Rhs = Self> {
+pub trait Dot<Rhs = Self> {
     type Output;
-    fn dot(&self, rhs: &Rhs) -> f32;
+    fn dot(&self, rhs: &Rhs) -> Self::Output;
 }
 
-pub(crate) trait Cross<Rhs = Self> {
+pub trait Cross<Rhs = Self> {
     type Output;
     fn cross(&self, rhs: &Rhs) -> Self::Output;
 }
 
-pub(crate) trait Normalize {
+pub trait Normalize {
     fn normalize(&self) -> Self;
 }
 
-pub(crate) trait Transpose {
+pub trait Length {
+    type Output;
+    fn length(&self) -> Self::Output;
+}
+
+pub trait Transpose {
     fn transpose(&self) -> Self;
 }
 
-pub(crate) trait Inverse {
+pub trait Inverse {
     fn inverse(&self) -> Self;
 }
 
-pub(crate) trait Determinant {
+pub trait Determinant {
     fn determinant(&self) -> f32;
 }

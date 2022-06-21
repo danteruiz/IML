@@ -16,7 +16,7 @@ mod mat3;
 pub use mat3::Mat3;
 mod mat4;
 pub use mat4::Mat4;
-mod ops;
+pub mod ops;
 mod point3;
 pub use point3::Point3;
 mod transform;
@@ -25,11 +25,17 @@ pub use transform::Transform;
 mod quat;
 pub use quat::Quat;
 pub mod shared;
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
+
+// common function
+
+pub fn dot<T: ops::Dot>(v1: &T, v2: &T) -> <T as ops::Dot>::Output {
+    T::dot(&v1, &v2)
+}
+
+pub fn length<T: ops::Length>(v: &T) -> <T as ops::Length>::Output {
+    v.length()
+}
+
+pub fn cross<T: ops::Cross>(v1: &T, v2: &T) -> <T as ops::Cross>::Output {
+    T::cross(&v1, &v2)
 }

@@ -17,12 +17,7 @@ pub struct Quat {
 
 impl Quat {
     fn new(w: f32, x: f32, y: f32, z: f32) -> Quat {
-        Quat {
-            w: w,
-            x: x,
-            y: y,
-            z: z,
-        }
+        Quat { w, x, y, z }
     }
 
     pub fn identity() -> Quat {

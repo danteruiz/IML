@@ -84,15 +84,15 @@ impl Cross for Vec3 {
 }
 
 impl Dot for Vec3 {
-    type Output = Self;
-    fn dot(&self, v: &Self) -> f32 {
+    type Output = f32;
+    fn dot(&self, v: &Self) -> Self::Output {
         self.x * v.x + self.y * v.y + self.z * v.z
     }
 }
 
 impl Dot<&Point3> for Vec3 {
-    type Output = Self;
-    fn dot(&self, p: &&Point3) -> f32 {
+    type Output = f32;
+    fn dot(&self, p: &&Point3) -> Self::Output {
         self.x * p.x + self.y * p.y + self.z * p.z
     }
 }
