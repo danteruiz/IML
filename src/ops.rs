@@ -36,3 +36,7 @@ pub trait Inverse {
 pub trait Determinant {
     fn determinant(&self) -> f32;
 }
+
+pub(crate) trait EqualEpsilon<Rhs = Self> {
+    fn equal_epsilon(&self, rhs: Rhs) -> bool;
+}

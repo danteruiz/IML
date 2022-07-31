@@ -117,3 +117,16 @@ impl fmt::Display for Point3 {
         write!(f, "({:.6}, {:.6}, {:.6}", self.x, self.y, self.z,)
     }
 }
+
+// macro_rules! point {
+//     ($name: ident, $data_type: ident, $($x:ident),*) => {
+//
+// 	struct $name {
+// 	    $(
+// 		$x: $data_type,
+// 	    )*
+// 	}
+//     };
+// }
+//
+// point!(Point4, f32, [x, y, z, w]);

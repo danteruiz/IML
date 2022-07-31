@@ -1,10 +1,11 @@
 use std::clone::Clone;
 use std::cmp::PartialEq;
 use std::convert::From;
-use std::fmt;
 use std::ops::Mul;
 
-use super::ops::Cross;
+use std::fmt;
+
+use super::ops::{Cross, EqualEpsilon};
 use super::vec3::Vec3;
 
 #[derive(Debug, Copy)]
@@ -67,6 +68,19 @@ impl From<Vec3> for Quat {
     }
 }
 
+impl EqualEpsilon for Quat {
+    fn equal_epsilon(&self, rhs: Self) -> bool {
+        let epsilon = 0.01;
+
+        let x_diff = (self.x - rhs.x).abs();
+        let y_diff = (self.y - rhs.y).abs();
+        let z_diff = (self.z - rhs.z).abs();
+        let w_diff = (self.w - rhs.w).abs();
+
+        x_diff < epsilon && y_diff < epsilon && z_diff < epsilon && w_diff < epsilon
+    }
+}
+
 impl Clone for Quat {
     fn clone(&self) -> Self {
         Quat::new(self.w, self.x, self.y, self.z)
@@ -111,13 +125,13 @@ mod tests {
 
         let result = Quat::new(-0.330961, -0.214658, 0.383051, 0.83526);
 
-        assert_eq!(q * q1, result);
+        assert_eq!((q * q1).equal_epsilon(result), true);
     }
     #[test]
     fn from_vec3() {
         let q = Quat::from(Vec3::new(10.0, -40.0, 50.0).to_radians());
         let result = Quat::new(0.835812, 0.21822, -0.274184, 0.422636);
 
-        assert_eq!(q, result);
+        assert_eq!(q.equal_epsilon(result), true);
     }
 }

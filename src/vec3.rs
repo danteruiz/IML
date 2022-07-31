@@ -16,202 +16,214 @@ use std::ops::{Add, Div, Index, IndexMut, Mul, MulAssign, Sub};
 
 // Vec3
 #[derive(Debug, Copy, Clone)]
-pub struct Vec3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+pub struct Vector3<T> {
+    pub x: T,
+    pub y: T,
+    pub z: T,
 }
 
-impl Vec3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
-        Vec3 { x, y, z }
+pub type Vec3 = Vector3<f32>;
+
+impl<T> Vector3<T> {
+    pub fn new(x: T, y: T, z: T) -> Vector3<T> {
+        Vector3 { x, y, z }
     }
 
-    pub fn inverse(&self) -> Vec3 {
-        self.clone() * -1.0
-    }
-
-    pub fn cos(&self) -> Vec3 {
-        Vec3 {
-            x: self.x.cos(),
-            y: self.y.cos(),
-            z: self.z.cos(),
-        }
-    }
-
-    pub fn sin(&self) -> Vec3 {
-        Vec3 {
-            x: self.x.sin(),
-            y: self.y.sin(),
-            z: self.z.sin(),
-        }
-    }
-
-    pub fn to_radians(&self) -> Vec3 {
-        Vec3 {
-            x: self.x.to_radians(),
-            y: self.y.to_radians(),
-            z: self.z.to_radians(),
-        }
-    }
-
-    pub fn as_ptr(&self) -> *const f32 {
+    pub fn as_ptr(&self) -> *const T {
         &self.x
     }
 }
 
-impl From<Vec4> for Vec3 {
-    fn from(v: Vec4) -> Vec3 {
-        Vec3::new(v.x, v.y, v.z)
-    }
-}
+macro_rules! vector3_common {
+    ($vec3: ident, $data_type: ident) => {
+        impl $vec3 {
+            pub fn inverse(&self) -> $vec3 {
+                self.clone() * -1.0
+            }
 
-impl From<[f32; 3]> for Vec3 {
-    fn from(data: [f32; 3]) -> Vec3 {
-        Vec3::new(data[0], data[1], data[2])
-    }
-}
+            pub fn cos(&self) -> $vec3 {
+                Vec3 {
+                    x: self.x.cos(),
+                    y: self.y.cos(),
+                    z: self.z.cos(),
+                }
+            }
 
-impl Cross for Vec3 {
-    type Output = Self;
-    fn cross(&self, v2: &Self) -> Vec3 {
-        Vec3 {
-            x: self.y * v2.z - self.z * v2.y,
-            y: self.z * v2.x - self.x * v2.z,
-            z: self.x * v2.y - self.y * v2.x,
+            pub fn sin(&self) -> $vec3 {
+                Vec3 {
+                    x: self.x.sin(),
+                    y: self.y.sin(),
+                    z: self.z.sin(),
+                }
+            }
+
+            pub fn to_radians(&self) -> $vec3 {
+                Vec3 {
+                    x: self.x.to_radians(),
+                    y: self.y.to_radians(),
+                    z: self.z.to_radians(),
+                }
+            }
         }
-    }
-}
 
-impl Dot for Vec3 {
-    type Output = f32;
-    fn dot(&self, v: &Self) -> Self::Output {
-        self.x * v.x + self.y * v.y + self.z * v.z
-    }
-}
-
-impl Dot<&Point3> for Vec3 {
-    type Output = f32;
-    fn dot(&self, p: &&Point3) -> Self::Output {
-        self.x * p.x + self.y * p.y + self.z * p.z
-    }
-}
-
-impl Normalize for Vec3 {
-    fn normalize(&self) -> Vec3 {
-        let magnitude = (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
-        return *self / magnitude;
-    }
-}
-
-impl Mul<f32> for Vec3 {
-    type Output = Self;
-    fn mul(self, scalar: f32) -> Self {
-        Self {
-            x: scalar * self.x,
-            y: scalar * self.y,
-            z: scalar * self.z,
+        impl From<Vec4> for $vec3 {
+            fn from(v: Vec4) -> $vec3 {
+                Vec3::new(v.x, v.y, v.z)
+            }
         }
-    }
-}
 
-impl MulAssign<f32> for Vec3 {
-    fn mul_assign(&mut self, scalar: f32) {
-        self.x *= scalar;
-        self.y *= scalar;
-        self.z *= scalar;
-    }
-}
-
-impl Mul for Vec3 {
-    type Output = Self;
-    fn mul(self, v: Self) -> Self {
-        Self {
-            x: self.x * v.x,
-            y: self.y * v.y,
-            z: self.z * v.z,
+        impl From<[$data_type; 3]> for $vec3 {
+            fn from(data: [$data_type; 3]) -> $vec3 {
+                $vec3::new(data[0], data[1], data[2])
+            }
         }
-    }
-}
 
-impl Mul<Vec3> for f32 {
-    type Output = Vec3;
-    fn mul(self, v: Vec3) -> Vec3 {
-        v * self
-    }
-}
-
-impl Sub for Vec3 {
-    type Output = Self;
-    fn sub(self, other: Self) -> Self {
-        Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
+        impl Cross for $vec3 {
+            type Output = Self;
+            fn cross(&self, v2: &Self) -> $vec3 {
+                Vec3 {
+                    x: self.y * v2.z - self.z * v2.y,
+                    y: self.z * v2.x - self.x * v2.z,
+                    z: self.x * v2.y - self.y * v2.x,
+                }
+            }
         }
-    }
-}
 
-impl Div<f32> for Vec3 {
-    type Output = Self;
-    fn div(self, scalar: f32) -> Self {
-        Self {
-            x: self.x / scalar,
-            y: self.y / scalar,
-            z: self.z / scalar,
+        impl Dot for $vec3 {
+            type Output = $data_type;
+            fn dot(&self, v: &Self) -> Self::Output {
+                self.x * v.x + self.y * v.y + self.z * v.z
+            }
         }
-    }
-}
 
-impl Add for Vec3 {
-    type Output = Self;
-    fn add(self, other: Self) -> Self {
-        Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
+        impl Dot<&Point3> for Vec3 {
+            type Output = f32;
+            fn dot(&self, p: &&Point3) -> Self::Output {
+                self.x * p.x + self.y * p.y + self.z * p.z
+            }
         }
-    }
-}
 
-impl PartialEq for Vec3 {
-    fn eq(&self, other: &Self) -> bool {
-        self.x == other.x && self.y == other.y && self.z == other.z
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        !(self == other)
-    }
-}
-
-impl Index<usize> for Vec3 {
-    type Output = f32;
-    fn index(&self, index: usize) -> &f32 {
-        match index {
-            0 => &self.x,
-            1 => &self.y,
-            2 => &self.z,
-            _ => panic!("Vec3 index out of bound: {}", index),
+        impl Normalize for $vec3 {
+            fn normalize(&self) -> $vec3 {
+                let magnitude = (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
+                return *self / magnitude;
+            }
         }
-    }
-}
 
-impl IndexMut<usize> for Vec3 {
-    fn index_mut(&mut self, index: usize) -> &mut f32 {
-        match index {
-            0 => &mut self.x,
-            1 => &mut self.y,
-            2 => &mut self.z,
-            _ => panic!("Vec3 index out of bound: {}", index),
+        impl Mul<$data_type> for $vec3 {
+            type Output = Self;
+            fn mul(self, scalar: $data_type) -> Self {
+                Self {
+                    x: scalar * self.x,
+                    y: scalar * self.y,
+                    z: scalar * self.z,
+                }
+            }
         }
-    }
+
+        impl Mul<$vec3> for $data_type {
+            type Output = $vec3;
+            #[inline(always)]
+            fn mul(self, v: $vec3) -> Self::Output {
+                v * self
+            }
+        }
+
+        impl MulAssign<$data_type> for $vec3 {
+            fn mul_assign(&mut self, scalar: f32) {
+                self.x *= scalar;
+                self.y *= scalar;
+                self.z *= scalar;
+            }
+        }
+
+        impl Mul for $vec3 {
+            type Output = Self;
+            fn mul(self, rhs: Self) -> Self {
+                Self {
+                    x: self.x * rhs.x,
+                    y: self.y * rhs.y,
+                    z: self.z * rhs.z,
+                }
+            }
+        }
+
+        impl Sub for $vec3 {
+            type Output = Self;
+            fn sub(self, rhs: Self) -> Self {
+                Self {
+                    x: self.x - rhs.x,
+                    y: self.y - rhs.y,
+                    z: self.z - rhs.z,
+                }
+            }
+        }
+
+        impl Div<$data_type> for $vec3 {
+            type Output = Self;
+            fn div(self, scalar: $data_type) -> Self {
+                Self {
+                    x: self.x / scalar,
+                    y: self.y / scalar,
+                    z: self.z / scalar,
+                }
+            }
+        }
+
+        impl Add for $vec3 {
+            type Output = Self;
+            #[inline(always)]
+            fn add(self, other: Self) -> Self {
+                Self {
+                    x: self.x + other.x,
+                    y: self.y + other.y,
+                    z: self.z + other.z,
+                }
+            }
+        }
+
+        impl PartialEq for $vec3 {
+            fn eq(&self, other: &Self) -> bool {
+                self.x == other.x && self.y == other.y && self.z == other.z
+            }
+
+            fn ne(&self, other: &Self) -> bool {
+                !(self == other)
+            }
+        }
+
+        impl Index<usize> for $vec3 {
+            type Output = $data_type;
+            fn index(&self, index: usize) -> &Self::Output {
+                match index {
+                    0 => &self.x,
+                    1 => &self.y,
+                    2 => &self.z,
+                    _ => panic!("Vec3 index out of bound: {}", index),
+                }
+            }
+        }
+
+        impl IndexMut<usize> for $vec3 {
+            fn index_mut(&mut self, index: usize) -> &mut $data_type {
+                match index {
+                    0 => &mut self.x,
+                    1 => &mut self.y,
+                    2 => &mut self.z,
+                    _ => panic!("Vec3 index out of bound: {}", index),
+                }
+            }
+        }
+
+        impl fmt::Display for $vec3 {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "({:.6}, {:.6}, {:.6}", self.x, self.y, self.z,)
+            }
+        }
+    };
 }
 
-impl fmt::Display for Vec3 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({:.6}, {:.6}, {:.6}", self.x, self.y, self.z,)
-    }
-}
+vector3_common!(Vec3, f32);
 
 #[cfg(test)]
 mod tests {
